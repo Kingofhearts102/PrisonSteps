@@ -99,10 +99,10 @@ namespace PrisonStep
 
             // As supplied, all of the doors are closed. This code opens each door by 
             // translating it up 2 meters.
-            foreach (int d in doors)
-            {
-                boneTransforms[d] = Matrix.CreateTranslation(0, 200, 0) * bindTransforms[d];
-            }
+           // foreach (int d in doors)
+           // {
+                //boneTransforms[d] = Matrix.CreateTranslation(0, 0, 0) * bindTransforms[d];
+           // }
 
          
         }
@@ -118,6 +118,25 @@ namespace PrisonStep
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+            
+
+        }
+
+        public void OpenDoor()
+        {
+            foreach (int d in doors)
+            {
+                boneTransforms[d] = Matrix.CreateTranslation(0, 200, 0) * bindTransforms[d];
+            }
+
+        }
+        public void CloseDoor()
+        {
+            foreach (int d in doors)
+            {
+                boneTransforms[d] = Matrix.CreateTranslation(0, 0, 0) * bindTransforms[d];
+            }
+
         }
 
         /// <summary>

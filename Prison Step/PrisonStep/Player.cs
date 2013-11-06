@@ -20,7 +20,7 @@ namespace PrisonStep
         /// is the list of triangles. Each triangle will have 3 vertices. 
         /// </summary>
         private Dictionary<string, List<Vector2>> regions = new Dictionary<string, List<Vector2>>();
-
+        private Dictionary<string, Vector3> doorLocations = new Dictionary<string, Vector3>();
         /// <summary>
         /// Game that uses this player
         /// </summary>
@@ -57,8 +57,11 @@ namespace PrisonStep
         /// </summary>
         private float moveRate = 500;
 
+        private string regionIn;
+
         #endregion
 
+        public string RegionIn { get { return regionIn; } }
 
         public Player(PrisonGame game)
         {
@@ -119,11 +122,17 @@ namespace PrisonStep
                         triangles.Add(new Vector2(v.X, v.Z));
                     }
 
-
                 }
 
                 regions[mesh.Name] = triangles;
             }
+
+            doorLocations["R_Door1"] = new Vector3(218,0, 1023);
+            doorLocations["R_Door2"] = new Vector3(-11,0, -769);
+            doorLocations["R_Door3"] = new Vector3(587,0, -999);
+            doorLocations["R_Door4"] = new Vector3(787,0, -763);
+            doorLocations["R_Door5"] = new Vector3(1187,0, -1218);
+
 
         }
 
@@ -148,7 +157,7 @@ namespace PrisonStep
                 rotation -= panRate * delta;
             }
 
-
+            
 
             if (keyboardState.IsKeyDown(Keys.Up))
             {
@@ -175,15 +184,37 @@ namespace PrisonStep
             //
 
             Vector3 translateVector = new Vector3((float)Math.Sin(orientation), 0, (float)Math.Cos(orientation));
+            Vector3 direction = translateVector;
             translateVector *= translation;
-
+           
             Vector3 newLocation = location + translateVector;
-            string region = TestRegion(newLocation);
-            //System.Diagnostics.Trace.WriteLine(region);
-            if (region != "")
+            regionIn = TestRegion(newLocation);
+         
+           // System.Diagnostics.Trace.WriteLine(regionIn);
+            translateVector.Normalize();
+            if (regionIn != "")
             {
                 location = newLocation;
             }
+            Console.WriteLine(regionIn);
+
+            if (regionIn == "R_Door1")
+            {
+                Vector3 vec = (doorLocations[regionIn] - location);
+                vec.Normalize();
+                if (CalculateAngleToDoor(vec, direction) > .70)
+                {
+                    game.PrisonModels[0].OpenDoor();
+                }
+                else
+                    game.PrisonModels[0].CloseDoor();
+            }
+            else
+                game.PrisonModels[0].CloseDoor();
+
+                    
+                
+
 
             SetPlayerTransform();
 
@@ -193,6 +224,11 @@ namespace PrisonStep
 
             game.Camera.Eye = location + new Vector3(0, 180, 0);
             game.Camera.Center = game.Camera.Eye + transform.Backward + new Vector3(0, -0.1f, 0);
+        }
+
+        private float CalculateAngleToDoor(Vector3 vec1, Vector3 vec2)
+        {
+            return Vector3.Dot(vec1, vec2);
         }
 
                /// <summary>

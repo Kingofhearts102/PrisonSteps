@@ -47,6 +47,10 @@ namespace PrisonStep
         /// </summary>
         public Camera Camera { get { return camera; } }
 
+        public Player Player { get { return player; } }
+
+        public List<PrisonModel> PrisonModels { get { return phibesModel; } }
+
         #endregion
 
 
