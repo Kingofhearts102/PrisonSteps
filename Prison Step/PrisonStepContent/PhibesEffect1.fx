@@ -27,7 +27,7 @@ struct VertexShaderOutput
 {
     float4 Position : POSITION0;
 	float4 Color : COLOR0;
-	float4 Pos1 : TEXCOORD1;
+	//float4 Pos1 : TEXCOORD1;
 
     // TODO: add vertex shader outputs such as colors and texture
     // coordinates here. These values will automatically be interpolated
@@ -61,19 +61,19 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	output.Color = float4(color, 1);
 
     // TODO: add your vertex shader code here.
-	output.Pos1 = output.Position;
+	//output.Pos1 = output.Position;
     return output;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
     // TODO: add your pixel shader code here.
-	float y = input.Pos1.y / input.Pos1.w;
+	//float y = input.Pos1.y / input.Pos1.w;
     	
-	if(y > 0.15) 
-		return float4(1, 0, 0, 1);
-	else
-		return input.Color;
+	//if(y > 0.15) 
+		//return float4(1, 0, 0, 1);
+	
+	return input.Color;
 }
 
 technique Technique1

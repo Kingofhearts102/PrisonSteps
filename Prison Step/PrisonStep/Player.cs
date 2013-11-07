@@ -192,13 +192,10 @@ namespace PrisonStep
          
            // System.Diagnostics.Trace.WriteLine(regionIn);
             translateVector.Normalize();
-            if (regionIn != "")
-            {
-                location = newLocation;
-            }
+
             Console.WriteLine(regionIn);
 
-            if (regionIn == "R_Door1")
+            if (regionIn.StartsWith("R_Door"))
             {
                 Vector3 vec = (doorLocations[regionIn] - location);
                 vec.Normalize();
@@ -206,14 +203,16 @@ namespace PrisonStep
                 {
                     game.PrisonModels[0].OpenDoor();
                 }
-                else
-                    game.PrisonModels[0].CloseDoor();
             }
             else
                 game.PrisonModels[0].CloseDoor();
 
-                    
-                
+
+
+            if (regionIn != "")
+            {
+                location = newLocation;
+            }    
 
 
             SetPlayerTransform();

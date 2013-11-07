@@ -14,13 +14,15 @@ namespace PrisonStep
     {
         #region Fields
 
-
-
+        enum DoorStates { Open, Opening, Closed, Closing };
+        DoorStates state;
         /// <summary>
         /// The section (6) of the ship
         /// </summary>
         private int section;
-
+        private float doorTranslation = 0;
+        private float timeToRasieDoor = 2;
+        private bool canMoveThrough = false;
         /// <summary>
         /// The name of the asset (FBX file) for this section
         /// </summary>
@@ -55,6 +57,12 @@ namespace PrisonStep
 
         #endregion
 
+        public bool CanMoveThrough
+        {
+            get { return canMoveThrough; }
+        }
+
+
         #region Construction and Loading
 
         /// <summary>
@@ -64,6 +72,7 @@ namespace PrisonStep
         /// <param name="section"></param>
         public PrisonModel(PrisonGame game, int section)
         {
+            state = DoorStates.Closed;
             this.game = game;
             this.section = section;
             this.asset = "AntonPhibes" + section.ToString();
@@ -118,23 +127,66 @@ namespace PrisonStep
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
-            
+
+            float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            switch (state)
+            {
+                case DoorStates.Closed:
+                    canMoveThrough = false;
+                    break;
+                case DoorStates.Open:
+                    canMoveThrough = true;
+                    break;
+
+                case DoorStates.Opening:
+                    canMoveThrough = false;
+                    doorTranslation += 200 *delta / timeToRasieDoor;
+
+                    if (doorTranslation >= 200)
+                    {
+                        state = DoorStates.Open;
+                        doorTranslation = 200;
+                    }
+                    foreach (int d in doors)
+                    {                        
+                        boneTransforms[d] = Matrix.CreateTranslation(0, doorTranslation, 0) * bindTransforms[d];
+                    }
+                    break;
+
+                case DoorStates.Closing:
+                    canMoveThrough = false;
+                    doorTranslation -= 200 * delta / timeToRasieDoor;
+                    if (doorTranslation <= 0)
+                    {
+                        state = DoorStates.Closed;
+                        doorTranslation = 0;
+                    }
+                    foreach (int d in doors)
+                    {
+                        boneTransforms[d] = Matrix.CreateTranslation(0, doorTranslation, 0) * bindTransforms[d];
+                    }
+                    break;
+
+            }
+
+
 
         }
 
         public void OpenDoor()
         {
-            foreach (int d in doors)
-            {
-                boneTransforms[d] = Matrix.CreateTranslation(0, 200, 0) * bindTransforms[d];
-            }
+            if (state != DoorStates.Open) 
+                state = DoorStates.Opening;
+                //boneTransforms[d] = Matrix.CreateTranslation(0, 200, 0) * bindTransforms[d];
+            
 
         }
         public void CloseDoor()
         {
             foreach (int d in doors)
             {
-                boneTransforms[d] = Matrix.CreateTranslation(0, 0, 0) * bindTransforms[d];
+                state = DoorStates.Closing;
+                //boneTransforms[d] = Matrix.CreateTranslation(0, 0, 0) * bindTransforms[d];
             }
 
         }
