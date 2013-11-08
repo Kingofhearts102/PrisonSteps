@@ -14,13 +14,14 @@ namespace PrisonStep
     public class Player
     {
         #region Fields
-
+        string lastSectionIn;
         /// <summary>
         /// List of regions for collision testing. The list of Vector2 objects
         /// is the list of triangles. Each triangle will have 3 vertices. 
         /// </summary>
         private Dictionary<string, List<Vector2>> regions = new Dictionary<string, List<Vector2>>();
         private Dictionary<string, Vector3> doorLocations = new Dictionary<string, Vector3>();
+        private int num;
         /// <summary>
         /// Game that uses this player
         /// </summary>
@@ -189,30 +190,49 @@ namespace PrisonStep
            
             Vector3 newLocation = location + translateVector;
             regionIn = TestRegion(newLocation);
-         
+            if (regionIn.StartsWith("S"))
+                lastSectionIn = regionIn;
            // System.Diagnostics.Trace.WriteLine(regionIn);
             translateVector.Normalize();
 
-            Console.WriteLine(regionIn);
-
+            
+            
             if (regionIn.StartsWith("R_Door"))
             {
                 Vector3 vec = (doorLocations[regionIn] - location);
                 vec.Normalize();
+
+                num = Convert.ToInt32(regionIn.Substring(regionIn.Length - 1)); 
                 if (CalculateAngleToDoor(vec, direction) > .70)
                 {
-                    game.PrisonModels[0].OpenDoor();
+
+                    game.PrisonModels[num -1].OpenDoor(1);
+                    game.PrisonModels[num].OpenDoor(1);
+                }
+                else if (Vector3.Distance(location, doorLocations[regionIn]) > 5)
+                {
+                    game.PrisonModels[num-1].CloseDoor(1);
+                    game.PrisonModels[num].CloseDoor(1);
                 }
             }
             else
-                game.PrisonModels[0].CloseDoor();
-
-
-
-            if (regionIn != "")
+            {
+                game.PrisonModels[num-1].CloseDoor(1);
+                game.PrisonModels[num].CloseDoor(1);
+                
+            }
+            if (regionIn != "" )
             {
                 location = newLocation;
-            }    
+            }
+            if (regionIn == "R_Section6")
+            {
+                game.ShouldSlime = true;
+            }
+            if (regionIn == "R_Section1")
+            {
+                game.ShouldSlime = false;
+            }
 
 
             SetPlayerTransform();
@@ -227,6 +247,7 @@ namespace PrisonStep
 
         private float CalculateAngleToDoor(Vector3 vec1, Vector3 vec2)
         {
+            Console.WriteLine(Vector3.Dot(vec1, vec2));
             return Vector3.Dot(vec1, vec2);
         }
 

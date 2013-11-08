@@ -28,6 +28,16 @@ namespace PrisonStep
         /// </summary>
         private Camera camera;
 
+        private bool shouldSlime = false;
+        private float slimeTime = 0;
+
+        public float SlimeTime
+        {
+            get { return slimeTime; }
+            set { slimeTime = value; }
+        }
+
+
         /// <summary>
         /// The player in your game is modeled with this class
         /// </summary>
@@ -48,6 +58,11 @@ namespace PrisonStep
         public Camera Camera { get { return camera; } }
 
         public Player Player { get { return player; } }
+        public bool ShouldSlime
+        {
+            get { return shouldSlime; }
+            set { shouldSlime = value; }
+        }
 
         public List<PrisonModel> PrisonModels { get { return phibesModel; } }
 
@@ -131,6 +146,19 @@ namespace PrisonStep
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
                 Keyboard.GetState().IsKeyDown(Keys.Escape))
                 this.Exit();
+
+            if (shouldSlime)
+            {
+                slimeTime += (float)gameTime.ElapsedGameTime.TotalSeconds /1;
+                if (slimeTime > 1)
+                    slimeTime = 1;
+            }
+            else
+            {
+                slimeTime -= (float)gameTime.ElapsedGameTime.TotalSeconds/1;
+                if (slimeTime < 0)
+                    slimeTime = 0;
+            }
 
             //
             // Update game components

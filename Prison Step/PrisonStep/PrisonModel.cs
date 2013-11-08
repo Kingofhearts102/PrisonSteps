@@ -137,7 +137,7 @@ namespace PrisonStep
                 case DoorStates.Open:
                     canMoveThrough = true;
                     break;
-
+                    
                 case DoorStates.Opening:
                     canMoveThrough = false;
                     doorTranslation += 200 *delta / timeToRasieDoor;
@@ -173,7 +173,7 @@ namespace PrisonStep
 
         }
 
-        public void OpenDoor()
+        public void OpenDoor(int x)
         {
             if (state != DoorStates.Open) 
                 state = DoorStates.Opening;
@@ -181,13 +181,12 @@ namespace PrisonStep
             
 
         }
-        public void CloseDoor()
+        public void CloseDoor(int x)
         {
-            foreach (int d in doors)
-            {
+            if(state!= DoorStates.Closed)
                 state = DoorStates.Closing;
                 //boneTransforms[d] = Matrix.CreateTranslation(0, 0, 0) * bindTransforms[d];
-            }
+            
 
         }
 
@@ -216,6 +215,7 @@ namespace PrisonStep
                     effect.Parameters["World"].SetValue(absoTransforms[mesh.ParentBone.Index] *world);
                     effect.Parameters["View"].SetValue(game.Camera.View);
                     effect.Parameters["Projection"].SetValue(game.Camera.Projection);
+                    effect.Parameters["ScreenGooPosition"].SetValue(game.SlimeTime);
                 }
                 mesh.Draw();
             }
